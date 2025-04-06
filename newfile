@@ -1,0 +1,27 @@
+import streamlit as st
+from your_model import get_job_recommendations  # your existing model code
+import tempfile
+
+st.title("📄 Job Recommendation System")
+st.write("Upload your resume (PDF or DOCX) and get personalized job recommendations.")
+
+# Upload file
+uploaded_file = st.file_uploader("Choose your resume file", type=["pdf", "docx"])
+
+if uploaded_file is not None:
+    # Save the uploaded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as temp_file:
+        temp_file.write(uploaded_file.getvalue())
+        temp_path = temp_file.name
+
+    st.success("Resume uploaded successfully!")
+
+    # Process and display recommendations
+    with st.spinner("Analyzing your resume and finding matching jobs..."):
+        try:
+            recommended_jobs = get_job_recommendations(temp_path)
+            st.subheader("🔍 Top Job Recommendations:")
+            for job in recommended_jobs:
+                st.markdown(f"- {job}")
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
